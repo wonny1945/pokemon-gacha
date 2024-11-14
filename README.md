@@ -1,36 +1,61 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Pokémon GACHA
 
-## Getting Started
+![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=next.js&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![TailwindCSS](https://img.shields.io/badge/TailwindCSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![Three.js](https://img.shields.io/badge/Three.js-000000?style=for-the-badge&logo=three.js&logoColor=white)
+![Shadcn](https://img.shields.io/badge/Shadcn-000000?style=for-the-badge&logo=shadcn&logoColor=white)
 
-First, run the development server:
+A nostalgic web-based Pokémon card collection game that brings childhood memories to life with modern 3D visualization technology.
+
+## Project Overview
+
+This side project recreates the excitement of random card draws from childhood, implementing 3D prism-style card animations in a web environment. It serves as both a nostalgic experience and a learning platform for advanced web visualization techniques.
+
+## Key Features
+
+- Interactive 3D card animations using Three.js
+- Realistic gacha (random draw) system
+- Collectible Pokémon cards with 3D prism effects
+- Card collection management system
+
+## Tech Stack
+
+- **Next.js**: React framework for production
+- **TailwindCSS**: Utility-first CSS framework
+- **Three.js**: 3D graphics library for web browsers
+- **TypeScript**: Type-safe development
+- **Shadcn**: UI component library
+
+## Development
 
 ```bash
+# Install dependencies
+npm install
+
+# Run development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# Build for production
+npm run build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Motivation
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+This project was inspired by childhood memories of collecting Pokémon cards and the discovery of modern web technologies capable of creating immersive 3D card experiences.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Security and Privacy
 
-## Learn More
+All operations are performed client-side, ensuring user data privacy and security.
 
-To learn more about Next.js, take a look at the following resources:
+## License
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+This project is available for non-commercial use. Please provide appropriate attribution when using the code.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Contributing
 
-## Deploy on Vercel
+Contributions are welcome! Please feel free to submit issues and pull requests.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Contact
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+For questions or suggestions, please open an issue in the repository.
