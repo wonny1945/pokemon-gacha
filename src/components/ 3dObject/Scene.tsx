@@ -106,10 +106,8 @@ const Scene = () => {
 
         {/* 3D 포켓볼 */}
         <Pokeball />
-
         {/* 환경 맵 추가 */}
         <Environment preset="sunset" />
-
         {/* 카메라 컨트롤 */}
         <OrbitControls enablePan={false} enableZoom={false} minDistance={3} maxDistance={8} />
       </Canvas>
