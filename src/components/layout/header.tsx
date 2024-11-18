@@ -1,6 +1,5 @@
 import {Button} from "@/components/ui/button"
 import AboutDialog from "@/components/ui/aboutDialog"
-import {BookText} from 'lucide-react';
 import {Linkedin} from 'lucide-react';
 import {Github} from 'lucide-react';
 
