@@ -28,7 +28,7 @@ export default function AboutDialog() {
                     <BookText className="text-slate-800 hover:text-slate-900"/>
                 </Button>
             </DialogTrigger>
-            <DialogContent className="text-sm">
+            <DialogContent className="text-sm sm:max-w-[425px] max-h-[90vh] overflow-y-auto w-[95vw] p-4">
                 <DialogHeader>
                     <DialogTitle className={`${pixelFont.className} text-amber-500 font-bold`}>Welcome to Pokemon Card
                         Gacha!</DialogTitle>
