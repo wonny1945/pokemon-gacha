@@ -1,5 +1,5 @@
 'use client'
-import Scene from '/src/components/3dObject/Scene'
+import Scene from '@/components/3dObject/Scene'
 import PokemonTitle from '@/components/ui/pokemonTitle'
 import StartButton from '@/components/ui/startButton'
 
