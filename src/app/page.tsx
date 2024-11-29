@@ -2,7 +2,6 @@
 import Scene from '/src/components/3dObject/Scene'
 import PokemonTitle from '@/components/ui/pokemonTitle'
 import StartButton from '@/components/ui/startButton'
-import Link from 'next/link'
 
 export default function Home() {
   return (
