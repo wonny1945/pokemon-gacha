@@ -19,8 +19,8 @@ export default function Header() {
     ];
 
     return (
-        <header className="fixed top-2 w-full">
-            <nav className="container mx-auto flex flex-row gap-3 justify-end px-2">
+        <header className="top-2 w-full  relative">
+            <nav className="container mx-auto flex flex-row gap-3 justify-end px-4">
                 <AboutDialog/>
                 {socialLinks.map((social, index) => {
                     const Icon = social.icon;

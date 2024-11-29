@@ -1,6 +1,7 @@
 'use client'
 import {Button} from "@/components/ui/button";
 import {Bangers} from 'next/font/google'
+import Link from 'next/link'
 
 const bangers = Bangers({
     subsets: ['latin'],
@@ -11,9 +12,10 @@ const bangers = Bangers({
 export default function StartButton() {
     return (
         <div>
-            <Button
-                variant="outline"
-                className={`
+            <Link href="/intro">
+                <Button
+                    variant="outline"
+                    className={`
         ${bangers.className}
         bg-gradient-to-b from-amber-300 to-amber-400 
         px-10 py-5 text-2xl rounded-lg 
@@ -21,8 +23,9 @@ export default function StartButton() {
         transition-all duration-1
         animate-bounce 
       `}>
-                Let&apos;s Go
-            </Button>
+                    Let&apos;s Go
+                </Button>
+            </Link>
         </div>
     )
 }

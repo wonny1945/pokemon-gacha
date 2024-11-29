@@ -1,4 +1,5 @@
 'use client'
+import { Suspense }  from 'react'
 
 import React, { useRef, useMemo } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
@@ -85,6 +86,7 @@ const Pokeball = () => {
 
 const Scene = () => {
   return (
+ 
       <div className="w-full h-1/2 ">
         <Canvas shadows gl={{ antialias: false }}>
           <PerspectiveCamera makeDefault position={[0, 0, 5]}/>
@@ -100,13 +102,15 @@ const Scene = () => {
               shadow-mapSize-height={1024}
           />
           <pointLight position={[-10, -10, -10]} intensity={0.5} />
-
+          <Suspense fallback={null}>
           <Pokeball />
+          </Suspense>
+          
           <Environment preset="sunset" background={false} />
           <OrbitControls enablePan={false} enableZoom={false} minDistance={3} maxDistance={8} />
         </Canvas>
-    </div>
+      </div>
+   
   )
 }
-
 export default Scene
