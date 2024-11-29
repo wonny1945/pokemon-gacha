@@ -50,7 +50,7 @@ export default function IntroTitle() {
                 Draw cards 
                 </span>
                 <span className="block text-4xl md:text-6xl text-red-500 mt-3 [text-shadow:_4px_4px_0_#3B82F6,_8px_8px_0_#1D4ED8] transform hover:scale-105 transition-transform">
-                    "Find legendary Pokemon"
+                    Find legendary Pokemon
                 </span>
             </h1>
         </div>
