@@ -1,13 +1,17 @@
 'use client'
 import { Suspense }  from 'react'
-
 import React, { useRef, useMemo } from 'react'
-import { Canvas, useFrame } from '@react-three/fiber'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { OrbitControls, PerspectiveCamera, Environment } from '@react-three/drei'
 import * as THREE from 'three'
 
+
+
 const Pokeball = () => {
   const pokeballRef = useRef<THREE.Group>(null)
+  const { viewport } = useThree()
+  
+  const scale = Math.min(viewport.width, viewport.height) * 0.18
 
   useFrame((state, delta) => {
     if (pokeballRef.current) {
@@ -47,7 +51,11 @@ const Pokeball = () => {
   }), [])
 
   return (
-      <group ref={pokeballRef}>
+      <group 
+        ref={pokeballRef} 
+        scale={scale}
+        position={[0, 0.8, 0]}
+      >
         <mesh castShadow receiveShadow geometry={geometries.bottomHalf}>
           <primitive object={materials.white} attach="material"/>
         </mesh>
@@ -86,31 +94,33 @@ const Pokeball = () => {
 
 const Scene = () => {
   return (
- 
-      <div className="w-full h-1/2 ">
-        <Canvas shadows gl={{ antialias: false }}>
-          <PerspectiveCamera makeDefault position={[0, 0, 5]}/>
-
-          <ambientLight intensity={0.3} />
-          <spotLight
-              position={[10, 10, 10]}
-              angle={0.3}
-              penumbra={1}
-              intensity={0.8}
-              castShadow
-              shadow-mapSize-width={1024}
-              shadow-mapSize-height={1024}
-          />
-          <pointLight position={[-10, -10, -10]} intensity={0.5} />
-          <Suspense fallback={null}>
+    <div className="w-full h-1/2 -mb-20 md:-mb-36" >
+      <Canvas shadows gl={{ antialias: true }}>
+        <PerspectiveCamera makeDefault position={[0, 0, 5]} />
+        <ambientLight intensity={0.3} />
+        <directionalLight
+          position={[5, 5, 5]}
+          intensity={0.8}
+          castShadow
+          shadow-mapSize-width={1024}
+          shadow-mapSize-height={1024}
+        />
+        <spotLight
+          position={[10, 10, 10]}
+          angle={0.2}
+          penumbra={0.5}
+          intensity={1.5}
+          castShadow
+        />
+        <pointLight position={[-10, -10, -10]} intensity={0.5} />
+        <pointLight position={[0, 5, 0]} intensity={0.7} color="blue" />
+        <pointLight position={[0, -5, 0]} intensity={0.7} color="red" />
+        <Suspense fallback={null}>
           <Pokeball />
-          </Suspense>
-          
-          <Environment preset="sunset" background={false} />
           <OrbitControls enablePan={false} enableZoom={false} minDistance={3} maxDistance={8} />
-        </Canvas>
-      </div>
-   
+        </Suspense>
+      </Canvas>
+    </div>
   )
 }
 export default Scene

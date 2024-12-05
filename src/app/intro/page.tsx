@@ -7,8 +7,10 @@ import StartButton from '@/components/ui/startButton'
 
 export default function IntroPage() {
   return (
-    <main className="flex flex-col w-full min-h-screen items-center pt-10 md:pt-40 gap-10">
-      <IntroTitle />
+    <main className="flex flex-col w-full min-h-screen items-center pt-0 md:pt-10 gap-10">
+       <div className="mt-5">
+        <IntroTitle />
+       </div>
       <PokemonCard />
       <StartButton />
     </main>
