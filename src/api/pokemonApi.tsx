@@ -54,7 +54,7 @@ export async function getRandomPokemon(): Promise<PokemonData> {
       description: koreanDescription.replace(/\n/g, ' ')
     };
   } catch (error: unknown) {
-    console.error('Pokemon 데이터를 불러오는데 실패했습니다:', error);
+    console.error('failed to load pokemon:', error);
     throw new Error('failed to load pokemon');
   }
 }

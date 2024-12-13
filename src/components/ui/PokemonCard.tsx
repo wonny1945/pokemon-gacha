@@ -24,8 +24,15 @@ const typeColors: { [key: string]: string } = {
   fairy: 'bg-pink-300',
 };
 
+interface Pokemon {
+  imageUrl: string;
+  koreanName: string;
+  types: string[];
+  description: string;
+}
+
 export default function PokemonCard() {
-  const [pokemon, setPokemon] = useState<any>(null);
+  const [pokemon, setPokemon] = useState<Pokemon | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const cardRef = useRef<HTMLDivElement>(null);
 
