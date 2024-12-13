@@ -25,6 +25,12 @@ interface FlavorTextEntry {
   flavor_text: string;
 }
 
+interface PokemonType {
+  type: {
+    name: string;
+  };
+}
+
 export async function getRandomPokemon(): Promise<PokemonData> {
   const randomId = Math.floor(Math.random() * POKEMON_COUNT) + 1;
   
@@ -48,7 +54,7 @@ export async function getRandomPokemon(): Promise<PokemonData> {
     return {
       id: pokemonData.id,
       name: pokemonData.name,
-      types: pokemonData.types.map((type: any) => type.type.name),
+      types: pokemonData.types.map((type: PokemonType) => type.type.name),
       imageUrl: pokemonData.sprites.other['official-artwork'].front_default,
       koreanName,
       description: koreanDescription.replace(/\n/g, ' ')
