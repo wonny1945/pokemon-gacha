@@ -1,6 +1,6 @@
 'use client'
 import React from 'react';
-import PokemonCardIntro from '@/components/ui/PokemonCardIntro';
+import PokemonCardIntro from '@/components/ui/pokemonCardIntro';
 import IntroTitle from '@/components/ui/IntroTitle';
 import StartButton from '@/components/ui/startButton'
 
