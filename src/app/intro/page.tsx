@@ -1,6 +1,6 @@
 'use client'
 import React from 'react';
-import PokemonCard from '@/components/ui/PokemonCard';
+import PokemonCardIntro from '@/components/ui/PokemonCardIntro';
 import IntroTitle from '@/components/ui/IntroTitle';
 import StartButton from '@/components/ui/startButton'
 
@@ -11,7 +11,7 @@ export default function IntroPage() {
        <div className="mt-5">
         <IntroTitle />
        </div>
-      <PokemonCard />
+      <PokemonCardIntro />
       <StartButton />
     </main>
   )
