@@ -171,7 +171,11 @@ const getImageContainerStyle = (rarity: PokemonRarity) => {
     }
   `;
 
-export default function GatchaCard() {
+interface IGatchaCardProps {
+  isRandom: boolean;
+}
+
+export default function GatchaCard({ isRandom }: IGatchaCardProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isFlipped, setIsFlipped] = useState(false);
   const [pokemon, setPokemon] = useState<Pokemon | null>(null);
