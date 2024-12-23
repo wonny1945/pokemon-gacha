@@ -8,24 +8,35 @@ const bangers = Bangers({
     weight: '400'
 })
 
+interface StartButtonProps {
+    text: string;
+    href?: string;
+    id?: string;
+}
 
-export default function StartButton() {
+export default function StartButton({ text, href, id }: StartButtonProps) {
+    const button = (
+        <Button
+            variant="outline"
+            className={`
+                ${bangers.className}
+                bg-gradient-to-b from-amber-300 to-amber-400 
+                px-10 py-5 text-2xl rounded-lg 
+                border-b-4 border-amber-500 
+                transition-all duration-1
+                animate-bounce 
+            `}>
+            {text}
+        </Button>
+    );
+
     return (
-        <div>
-            <Link href="/intro">
-                <Button
-                    variant="outline"
-                    className={`
-        ${bangers.className}
-        bg-gradient-to-b from-amber-300 to-amber-400 
-        px-10 py-5 text-2xl rounded-lg 
-        border-b-4 border-amber-500 
-        transition-all duration-1
-        animate-bounce 
-      `}>
-                    Let&apos;s Go
-                </Button>
-            </Link>
+        <div {...(id && { id })}>
+            {href ? (
+                <Link href={href}>{button}</Link>
+            ) : (
+                button
+            )}
         </div>
-    )
+    );
 }
