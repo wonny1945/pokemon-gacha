@@ -187,7 +187,8 @@ export default function GatchaCard({ isRandom }: IGatchaCardProps) {
     
     try {
       setIsLoading(true);
-      const randomPokemon = await getRandomPokemon('all'); // 랜덤 확률로 포켓몬 뽑기
+      const pokemonType = isRandom ? 'all' : 'common';
+      const randomPokemon = await getRandomPokemon(pokemonType);
       setPokemon(randomPokemon);
       setIsFlipped(true);
     } catch (error) {
