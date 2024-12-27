@@ -43,7 +43,10 @@ const typeColors: { [key: string]: string } = {
   fairy: 'bg-pink-300',
 };
 
-const RARITY_GRADIENTS = {
+const RARITY_GRADIENTS: Record<Exclude<PokemonRarity, 'all'>, {
+  colors: string[];
+  shadow: string;
+}> = {
   legendary: {
     colors: ['#FFD700', '#FDB931', '#FFE45C', '#FDB931', '#FFD700'],
     shadow: 'rgba(255, 215, 0, 0.8)',
@@ -56,12 +59,13 @@ const RARITY_GRADIENTS = {
     colors: ['#f9fafb', '#f3f4f6'],
     shadow: 'rgba(0, 0, 0, 0.3)',
   },
-} as const;
+};
 
 const getRarityStyle = (rarity: PokemonRarity, type: 'card' | 'container') => {
-  const gradient = RARITY_GRADIENTS[rarity] || RARITY_GRADIENTS.common;
+  const effectiveRarity = rarity === 'all' ? 'common' : rarity;
+  const gradient = RARITY_GRADIENTS[effectiveRarity];
   
-  if (rarity === 'common') {
+  if (effectiveRarity === 'common') {
     return {
       background: `linear-gradient(to bottom, ${gradient.colors.join(', ')})`,
       boxShadow: `inset 0 0 5px ${gradient.shadow}`,
@@ -83,7 +87,7 @@ const getRarityStyle = (rarity: PokemonRarity, type: 'card' | 'container') => {
     return {
       ...baseStyle,
       boxShadow: `0 0 35px ${gradient.shadow}`,
-      ...(rarity === 'rare' && {
+      ...(effectiveRarity === 'rare' && {
         border: '4px solid rgba(255, 215, 0, 0.5)',
       }),
     };
