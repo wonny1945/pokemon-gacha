@@ -34,47 +34,54 @@ interface Pokemon {
   rarity: PokemonRarity;
 }
 
+const RARITY_GRADIENTS = {
+  legendary: {
+    colors: ['#FFD700', '#FDB931', '#FFE45C', '#FDB931', '#FFD700'],
+    shadow: 'rgba(255, 215, 0, 0.8)',
+  },
+  rare: {
+    colors: ['#9333EA', '#A855F7', '#C084FC', '#A855F7', '#9333EA'],
+    shadow: 'rgba(147, 51, 234, 0.8)',
+  },
+  common: {
+    colors: ['#f9fafb', '#f3f4f6'],
+    shadow: 'rgba(0, 0, 0, 0.3)',
+  },
+} as const;
 
-const getRarityStyle = (rarity: PokemonRarity) => {
-  switch (rarity) {
-    case 'legendary':
-      return {
-        background: `
-          linear-gradient(
-            125deg, 
-            #FFD700 0%, 
-            #FDB931 25%, 
-            #FFE45C 50%, 
-            #FDB931 75%, 
-            #FFD700 100%
-          )
-        `,
-        backgroundSize: '400% 400%',
-        animation: 'shimmer 3s ease-in-out infinite',
-        boxShadow: '0 0 15px rgba(255, 215, 0, 0.5)',
-      };
-    case 'rare':
-      return {
-        background: `
-          linear-gradient(
-            125deg,
-            #9333EA 0%,
-            #A855F7 25%,
-            #C084FC 50%,
-            #A855F7 75%,
-            #9333EA 100%
-          )
-        `,
-        backgroundSize: '400% 400%',
-        animation: 'shimmer 3s ease-in-out infinite',
-        boxShadow: '0 0 15px rgba(147, 51, 234, 0.5)',
-      };
-    default:
-      return {
-        background: 'white',
-        boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
-      };
+const getRarityStyle = (rarity: PokemonRarity, type: 'card' | 'container') => {
+  const gradient = RARITY_GRADIENTS[rarity] || RARITY_GRADIENTS.common;
+  
+  if (rarity === 'common') {
+    return {
+      background: `linear-gradient(to bottom, ${gradient.colors.join(', ')})`,
+      boxShadow: `inset 0 0 5px ${gradient.shadow}`,
+    };
   }
+
+  const baseStyle = {
+    background: `
+      linear-gradient(
+        125deg,
+        ${gradient.colors.map((color, i) => `${color} ${i * 25}%`).join(', ')}
+      )
+    `,
+    backgroundSize: '400% 400%',
+    animation: `${type === 'card' ? 'shimmer' : 'shimmerBg'} 5s ease-in-out infinite`,
+  };
+
+  return type === 'card' 
+    ? {
+        ...baseStyle,
+        boxShadow: `0 0 35px ${gradient.shadow}`,
+        ...(rarity === 'rare' && {
+          border: '4px solid rgba(255, 215, 0, 0.5)',
+        }),
+      }
+    : {
+        ...baseStyle,
+        boxShadow: `inset 0 0 30px ${gradient.shadow}, 0 0 20px ${gradient.shadow}`,
+      };
 };
 
 const shineEffect = {
@@ -97,55 +104,6 @@ const shineEffect = {
   pointerEvents: 'none' as const,
 };
 
-const getImageContainerStyle = (rarity: PokemonRarity) => {
-  switch (rarity) {
-    case 'legendary':
-      return {
-        background: `
-          linear-gradient(
-            125deg,
-            rgba(255, 215, 0, 0.3) 0%,
-            rgba(255, 255, 255, 0.6) 25%,
-            rgba(255, 223, 0, 0.5) 50%,
-            rgba(255, 255, 255, 0.6) 75%,
-            rgba(255, 215, 0, 0.3) 100%
-          )
-        `,
-        backgroundSize: '400% 400%',
-        animation: 'shimmerBg 5s ease-in-out infinite',
-        boxShadow: `
-          inset 0 0 30px rgba(255, 215, 0, 0.4),
-          inset 0 0 60px rgba(255, 215, 0, 0.2),
-          0 0 20px rgba(255, 215, 0, 0.2)
-        `,
-      };
-    case 'rare':
-      return {
-        background: `
-          linear-gradient(
-            125deg,
-            rgba(147, 51, 234, 0.3) 0%,
-            rgba(255, 255, 255, 0.6) 25%,
-            rgba(168, 85, 247, 0.5) 50%,
-            rgba(255, 255, 255, 0.6) 75%,
-            rgba(147, 51, 234, 0.3) 100%
-          )
-        `,
-        backgroundSize: '400% 400%',
-        animation: 'shimmerBg 5s ease-in-out infinite',
-        boxShadow: `
-          inset 0 0 30px rgba(147, 51, 234, 0.4),
-          inset 0 0 60px rgba(147, 51, 234, 0.2),
-          0 0 20px rgba(147, 51, 234, 0.2)
-        `,
-      };
-    default:
-      return {
-        background: 'linear-gradient(to bottom, #f9fafb, #f3f4f6)',
-        boxShadow: 'inset 0 0 5px rgba(0, 0, 0, 0.1)',
-      };
-  }
-};
 
 const keyframes = `
   @keyframes shimmer {
@@ -427,76 +385,80 @@ export default function PokemonCard() {
         <div 
           ref={cardRef}
           id="pokemon-card"
-          className="w-full max-w-xs overflow-hidden transition-transform duration-200 ease-out relative p-2 rounded-2xl"
+          className="w-full max-w-xs relative rounded-2xl min-h-[450px]"
+          style={{ 
+            transformStyle: 'preserve-3d',
+            transition: 'transform 0.1s ease-out',
+            willChange: 'transform'
+          }}
           onMouseMove={handleMouseMove}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
           onMouseDown={handleMouseDown}
-          style={{ 
-            ...getRarityStyle(pokemon?.rarity || 'common'),
-            transformStyle: 'preserve-3d',
-          }}
         >
-          <div style={{
-            ...shineEffect,
-            borderRadius: '1rem',
-            animation: isHovered ? 'shine 1s cubic-bezier(0.4, 0, 0.2, 1)' : 'none',
-          }} />
-          
-          {/* 카드 내부 컨텐츠 */}
-          <div className="bg-gradient-to-br from-gray-100 via-white to-gray-200 rounded-xl p-4 backdrop-blur-sm bg-opacity-80 shadow-inner relative before:absolute before:inset-0 before:bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.8)_10%,transparent_20%)] before:bg-[length:10px_10px]"
-               style={{ transform: 'translateZ(20px)' }}>
-            
-            {/* 카드 등급 표시 */}
-            <div className="text-sm mb-2 font-bold z-10 relative">
-              <span className={
-                pokemon?.rarity === 'legendary'
-                  ? 'text-amber-500'
-                  : pokemon?.rarity === 'rare'
-                    ? 'text-purple-500'
-                    : 'text-gray-500'
-              }>
-                {pokemon?.rarity === 'legendary'
-                  ? '전설의 포켓몬'
-                  : pokemon?.rarity === 'rare'
-                    ? '희귀 포켓몬'
-                    : '일반 포켓몬'}
-              </span>
-            </div>
-
-            {/* 이미지 영역 수정 */}
+          <div 
+            className="w-full max-w-xs overflow-hidden transition-transform duration-200 ease-out relative p-0 rounded-2xl"
+            style={{
+              transformStyle: 'preserve-3d',
+              ...getRarityStyle(pokemon?.rarity || 'common', 'card')
+            }}
+          >
             <div 
-              className="mb-4 p-4 rounded-xl border border-gray-200 overflow-hidden relative z-10"
               style={{
-                ...getImageContainerStyle(pokemon?.rarity || 'common'),
-                transform: 'translateZ(10px)',
-              }}
-            >
-              <div className="relative z-10 transform transition-transform duration-300">
-                <Image
-                  src={pokemon?.imageUrl || ''}
-                  alt={pokemon?.koreanName || ''}
-                  width={300}
-                  height={300}
-                  className="w-full h-auto"
-                />
-              </div>
-            </div>
+                ...shineEffect,
+                borderRadius: '1rem',
+                animation: isHovered ? 'shine 1s cubic-bezier(0.4, 0, 0.2, 1)' : 'none',
+              }} 
+            />
             
-            {/* 정보 영역 */}
-            <div className="mt-4 border-t border-gray-200 pt-4 z-10 relative">
-              <h2 className="text-xl font-bold mb-2">{pokemon?.koreanName}</h2>
-              <div className="flex gap-2 mb-3">
-                {pokemon?.types.map((type: string) => (
-                  <span
-                    key={type}
-                    className={`${typeColors[type] || 'bg-gray-500'} px-3 py-1 rounded-full text-white text-sm`}
-                  >
-                    {type}
-                  </span>
-                ))}
+            <div 
+              className="bg-gradient-to-br from-gray-100 via-white to-gray-200 rounded-xl p-4 backdrop-blur-sm bg-opacity-80 shadow-inner relative before:absolute before:inset-0 before:bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.8)_10%,transparent_20%)] before:bg-[length:10px_10px]"
+              style={{ transform: 'translateZ(20px)' }}
+            >
+              <div className="text-sm mb-2 font-bold z-10 relative text-left">
+                <span className={
+                  pokemon?.rarity === 'legendary' ? 'text-amber-500' :
+                  pokemon?.rarity === 'rare' ? 'text-purple-500' : 
+                  'text-gray-500'
+                }>
+                  {pokemon?.rarity === 'legendary' ? '전설의 포켓몬' :
+                   pokemon?.rarity === 'rare' ? '희귀 포켓몬' : 
+                   '일반 포켓몬'}
+                </span>
               </div>
-              <p className="text-gray-600 text-sm">{pokemon?.description}</p>
+
+              <div 
+                className="mb-4 p-4 rounded-xl border border-gray-200 overflow-hidden relative z-10"
+                style={{
+                  ...getRarityStyle(pokemon?.rarity || 'common', 'container'),
+                  transform: 'translateZ(10px)',
+                }}
+              >
+                <div className="relative z-10 transform transition-transform duration-300">
+                  <Image
+                    src={pokemon?.imageUrl || ''}
+                    alt={pokemon?.koreanName || ''}
+                    width={300}
+                    height={300}
+                    className="w-full h-auto"
+                  />
+                </div>
+              </div>
+
+              <div className="mt-4 border-t border-gray-200 pt-4 z-10 relative text-left">
+                <h2 className="text-xl font-bold mb-2">{pokemon?.koreanName}</h2>
+                <div className="flex gap-2 mb-3">
+                  {pokemon?.types.map((type: string) => (
+                    <span
+                      key={type}
+                      className={`${typeColors[type] || 'bg-gray-500'} px-3 py-1 rounded-full text-white text-sm`}
+                    >
+                      {type}
+                    </span>
+                  ))}
+                </div>
+                <p className="text-gray-600 text-sm">{pokemon?.description}</p>
+              </div>
             </div>
           </div>
         </div>
