@@ -1,15 +1,14 @@
 import {Button} from "@/components/ui/button"
 import AboutDialog from "@/components/ui/aboutDialog"
-import {Linkedin} from 'lucide-react';
 import {Github} from 'lucide-react';
-
+import {User} from 'lucide-react';
 
 export default function Header() {
     const socialLinks = [
         {
-            icon: Linkedin,
-            href: "https://www.linkedin.com/in/%EC%A4%80%EC%9D%BC-%EC%9B%90-58975525b/",
-            ariaLabel: "LinkedIn 프로필"
+            icon: User,
+            href: "https://bento.me/wonny",
+            ariaLabel: "개인 프로필"
         },
         {
             icon: Github,
