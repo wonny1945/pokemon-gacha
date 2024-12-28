@@ -3,7 +3,9 @@ import React, { useState, useRef } from 'react';
 import { getRandomPokemon, PokemonRarity } from '@/api/pokemonApi';
 import Image from 'next/image';
 import { Button } from "@/components/ui/button";
+import ShareButtons from '@/components/ui/ShareButtons';
 import { Bangers } from 'next/font/google'
+
 
 const bangers = Bangers({
   weight: '400',
@@ -265,7 +267,7 @@ export default function GatchaCard({ isRandom }: IGatchaCardProps) {
             }}
           >
             <div className="relative z-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl p-4 backdrop-blur-sm bg-opacity-80 shadow-inner before:absolute before:inset-0 before:bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.8)_10%,transparent_20%)] before:bg-[length:10px_10px] flex items-center justify-center min-h-[450px]">
-              <span className="text-white text-xl font-bold">Click the Pokemon card!</span>
+              <span className="text-white text-xl font-bold">Click to draw a Pokemon!</span>
             </div>
           </div>
 
@@ -349,7 +351,16 @@ export default function GatchaCard({ isRandom }: IGatchaCardProps) {
       </div>
 
       {(isFlipped || isTransitioning) && (
-        <div className="max-w-xs mt-10">
+        <div className="max-w-xs mt-7 flex flex-col items-center">
+          {/* Share Buttons */}
+          {pokemon && (
+            <ShareButtons 
+              pokemonName={pokemon.koreanName} 
+              cardRarity={pokemon.rarity}
+            />
+          )}
+          
+          {/* Try Again Button */}
           <Button
             variant="outline"
             size="lg"
@@ -359,9 +370,9 @@ export default function GatchaCard({ isRandom }: IGatchaCardProps) {
               bg-gradient-to-b from-amber-300 to-amber-400 
               px-10 py-5 text-2xl rounded-lg 
               border-b-4 border-amber-500 
-              transition-all duration-1
+              transition-all duration-600
               animate-bounce
-              mt-5
+              mt-6
             `}
           >
             Try Again
