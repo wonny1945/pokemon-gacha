@@ -280,7 +280,7 @@ export default function GatchaCard({ isRandom }: IGatchaCardProps) {
   };
 
   return (
-    <div className="flex flex-col items-center gap-8">
+    <div className="flex flex-col items-center gap-20 ">
       <style>{keyframes}</style>
       <div 
         ref={cardRef}
@@ -416,7 +416,7 @@ export default function GatchaCard({ isRandom }: IGatchaCardProps) {
       </div>
 
       {(isFlipped || isTransitioning) && (
-        <div className="max-w-xs mt-7 flex flex-col items-center">
+        <div className="max-w-xs flex flex-col items-center">
           {/* Share Buttons */}
           {pokemon && (
             <ShareButtons 

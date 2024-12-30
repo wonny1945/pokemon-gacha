@@ -246,8 +246,10 @@ export default function PokemonCard() {
 
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center">
+        {/* 배경 오버레이 */}
         <div className="absolute inset-0 bg-black bg-opacity-50" />
         
+        {/* 하이라이트 영역 */}
         {targetRect && (
           <div 
             className="absolute"
@@ -382,6 +384,38 @@ export default function PokemonCard() {
     document.addEventListener('mouseup', onMouseUp);
   };
 
+  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    e.preventDefault();
+    
+    const touch = e.touches[0];
+    const card = cardRef.current;
+    const rect = card.getBoundingClientRect();
+    const x = touch.clientX - rect.left;
+    const y = touch.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    
+    const rotateX = ((y - centerY) / 20);
+    const rotateY = (-(x - centerX) / 20);
+    
+    card.style.transition = 'transform 0.1s ease-out';
+    card.style.transform = `
+      perspective(1000px) 
+      rotateX(${rotateX}deg) 
+      rotateY(${rotateY}deg)
+      scale3d(1.02, 1.02, 1.02)
+    `;
+  };
+
+  const handleTouchStart = () => {
+    setIsHovered(true);
+  };
+
+  const handleTouchEnd = () => {
+    handleMouseLeave();
+  };
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center">
@@ -461,7 +495,7 @@ export default function PokemonCard() {
         <div 
           ref={cardRef}
           id="pokemon-card"
-          className="w-full max-w-xs relative rounded-2xl min-h-[450px]"
+          className="w-full max-w-xs relative rounded-2xl min-h-[450px] touch-none"
           style={{ 
             transformStyle: 'preserve-3d',
             transition: 'transform 0.1s ease-out',
@@ -471,6 +505,9 @@ export default function PokemonCard() {
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
           onMouseDown={handleMouseDown}
+          onTouchMove={handleTouchMove}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
         >
           <div 
             className="w-full max-w-xs overflow-hidden transition-transform duration-200 ease-out relative p-0 rounded-2xl"
