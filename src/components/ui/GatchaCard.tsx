@@ -181,7 +181,7 @@ export default function GatchaCard({ isRandom }: IGatchaCardProps) {
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current) return;
+    if (!cardRef.current || !isFlipped) return;
     
     const card = cardRef.current;
     const rect = card.getBoundingClientRect();
@@ -245,8 +245,42 @@ export default function GatchaCard({ isRandom }: IGatchaCardProps) {
     }, 1000);
   };
 
+  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (!cardRef.current || !isFlipped) return;
+    e.preventDefault();
+    
+    const touch = e.touches[0];
+    const card = cardRef.current;
+    const rect = card.getBoundingClientRect();
+    const x = touch.clientX - rect.left;
+    const y = touch.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    
+    const rotateX = ((y - centerY) / 20);
+    const rotateY = (-(x - centerX) / 20);
+    
+    card.style.transition = 'transform 0.1s ease-out';
+    card.style.transform = `
+      perspective(1000px) 
+      rotateX(${rotateX}deg) 
+      rotateY(${rotateY}deg)
+      scale3d(1.02, 1.02, 1.02)
+    `;
+  };
+
+  const handleTouchStart = () => {
+    if (!isFlipped) return;
+    setIsHovered(true);
+  };
+
+  const handleTouchEnd = () => {
+    if (!isFlipped) return;
+    handleMouseLeave();
+  };
+
   return (
-    <div className="flex flex-col items-center gap-8">
+    <div className="flex flex-col items-center gap-20 ">
       <style>{keyframes}</style>
       <div 
         ref={cardRef}
@@ -254,6 +288,7 @@ export default function GatchaCard({ isRandom }: IGatchaCardProps) {
           w-full max-w-xs relative rounded-2xl min-h-[450px]
           [transform-style:preserve-3d]
           hover:cursor-pointer
+          touch-none
           ${isLoading ? 'animate-pulse pointer-events-none' : ''}
         `}
         style={{
@@ -266,6 +301,9 @@ export default function GatchaCard({ isRandom }: IGatchaCardProps) {
         onMouseLeave={handleMouseLeave}
         onMouseEnter={() => setIsHovered(true)}
         onMouseDown={handleMouseDown}
+        onTouchMove={handleTouchMove}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
       >
         <div 
           className={`
@@ -378,7 +416,7 @@ export default function GatchaCard({ isRandom }: IGatchaCardProps) {
       </div>
 
       {(isFlipped || isTransitioning) && (
-        <div className="max-w-xs mt-7 flex flex-col items-center">
+        <div className="max-w-xs flex flex-col items-center">
           {/* Share Buttons */}
           {pokemon && (
             <ShareButtons 
