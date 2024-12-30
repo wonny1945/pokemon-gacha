@@ -4,9 +4,25 @@ import {Button} from "@/components/ui/button"
 import AboutDialog from "@/components/ui/aboutDialog"
 import {Github, User, Languages} from 'lucide-react';
 import {useLanguageStore} from '@/store/languageStore';
+import {getPokemonById} from '@/api/pokemonApi';
+import {useEffect} from 'react';
 
 export default function Header() {
-    const {language, toggleLanguage} = useLanguageStore();
+    const {language, toggleLanguage, currentPokemonId} = useLanguageStore();
+
+    useEffect(() => {
+        const reloadCurrentPokemon = async () => {
+            if (currentPokemonId) {
+                try {
+                    await getPokemonById(currentPokemonId, language);
+                } catch (error) {
+                    console.error('Failed to reload pokemon:', error);
+                }
+            }
+        };
+
+        reloadCurrentPokemon();
+    }, [language, currentPokemonId]);
 
     const socialLinks = [
         {
