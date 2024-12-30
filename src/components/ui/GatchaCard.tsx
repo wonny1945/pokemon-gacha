@@ -269,12 +269,12 @@ export default function GatchaCard({ isRandom }: IGatchaCardProps) {
     `;
   };
 
-  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+  const handleTouchStart = () => {
     if (!isFlipped) return;
     setIsHovered(true);
   };
 
-  const handleTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
+  const handleTouchEnd = () => {
     if (!isFlipped) return;
     handleMouseLeave();
   };
