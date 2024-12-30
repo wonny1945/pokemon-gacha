@@ -2,6 +2,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { getRandomPokemon } from '@/api/pokemonApi';
 import Image from 'next/image';
+import { useLanguageStore } from '@/store/languageStore';
 
 export type PokemonRarity = 'legendary' | 'rare' | 'common' | 'all';
 
@@ -136,6 +137,69 @@ const keyframes = `
   }
 `;
 
+const TRANSLATIONS = {
+  ko: {
+    legendary: '전설의 포켓몬',
+    rare: '레어 포켓몬',
+    common: '일반 포켓몬',
+    loading: '로딩중...',
+    error: '포켓몬을 불러오는데 실패했습니다',
+    tryAgain: '다시 시도하거나 관리자에게 문의하세요',
+    tutorial: {
+      skip: '건너뛰기',
+      next: '다음',
+      complete: '완료',
+      steps: [
+        {
+          content: "✨ 와우! 전설의 포켓몬을 발견할 기회예요! (10%의 확률로 황금빛 카드가 등장합니다)"
+        },
+        {
+          content: "🌟 희귀한 포켓몬과의 운명적인 만남! (20%의 확률로 신비로운 보라빛 카드가 나타납니다)"
+        },
+        {
+          content: "🎯 평범해 보여도 특별한 인연이 될 수 있어요! (70%의 확률로 기본 카드가 등장합니다)"
+        },
+        {
+          content: "🃏 카드를 자유롭게 움직여 포켓몬과 교감해보세요!"
+        },
+        {
+          content: "🎮 준비가 되었다면 Let's Go 버튼을 눌러 게임을 시작해보세요!"
+        }
+      ]
+    }
+  },
+  en: {
+    legendary: 'Legendary Pokemon',
+    rare: 'Rare Pokemon', 
+    common: 'Common Pokemon',
+    loading: 'Loading...',
+    error: 'Failed to load pokemon',
+    tryAgain: 'Try again or send feedback to admin',
+    tutorial: {
+      skip: 'Skip',
+      next: 'Next',
+      complete: 'Complete',
+      steps: [
+        {
+          content: "✨ Wow! A chance to discover a Legendary Pokemon! (10% chance for a golden card)"
+        },
+        {
+          content: "🌟 A fateful encounter with a rare Pokemon! (20% chance for a mysterious purple card)"
+        },
+        {
+          content: "🎯 Even common Pokemon can become special! (70% chance for a basic card)"
+        },
+        {
+          content: "🃏 Move the card freely to interact with your Pokemon!"
+        },
+        {
+          content: "🎮 Ready to start? Press the Let's Go button!"
+        }
+      ]
+    }
+  }
+} as const;
+
 export default function PokemonCard() {
   const [pokemon, setPokemon] = useState<Pokemon | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -171,6 +235,8 @@ export default function PokemonCard() {
     }
   ];
 
+  const { language } = useLanguageStore();
+
   const TutorialOverlay = () => {
     if (!showTutorial) return null;
 
@@ -180,10 +246,8 @@ export default function PokemonCard() {
 
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center">
-        {/* 배경 오버레이 */}
         <div className="absolute inset-0 bg-black bg-opacity-50" />
         
-        {/* 하이라이트 영역 */}
         {targetRect && (
           <div 
             className="absolute"
@@ -200,7 +264,6 @@ export default function PokemonCard() {
           />
         )}
 
-        {/* 튜토리얼 메시지 */}
         <div 
           className="fixed bg-white rounded-lg p-4 max-w-xs w-full mx-4"
           style={{
@@ -210,13 +273,15 @@ export default function PokemonCard() {
             zIndex: 52
           }}
         >
-          <p className="text-gray-800 mb-4">{currentStep.content}</p>
+          <p className="text-gray-800 mb-4">
+            {TRANSLATIONS[language].tutorial.steps[tutorialStep].content}
+          </p>
           <div className="flex justify-between">
             <button
               onClick={() => setShowTutorial(false)}
               className="text-gray-500 hover:text-gray-700 px-4 py-2 rounded-lg"
             >
-              건너뛰기
+              {TRANSLATIONS[language].tutorial.skip}
             </button>
             <button
               onClick={() => {
@@ -228,7 +293,9 @@ export default function PokemonCard() {
               }}
               className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
             >
-              {tutorialStep === tutorialSteps.length - 1 ? '완료' : '다음'}
+              {tutorialStep === tutorialSteps.length - 1 
+                ? TRANSLATIONS[language].tutorial.complete 
+                : TRANSLATIONS[language].tutorial.next}
             </button>
           </div>
         </div>
@@ -356,7 +423,7 @@ export default function PokemonCard() {
                 active:border-b-2 active:shadow-inner
               `}
             >
-              전설의 포켓몬
+              {TRANSLATIONS[language].legendary}
             </button>
             <button 
               id="rare-btn"
@@ -371,7 +438,7 @@ export default function PokemonCard() {
                 active:border-b-2 active:shadow-inner
               `}
             >
-              레어 포켓몬
+              {TRANSLATIONS[language].rare}
             </button>
             <button 
               id="common-btn"
@@ -386,7 +453,7 @@ export default function PokemonCard() {
                 active:border-b-2 active:shadow-inner
               `}
             >
-              일반 포켓몬
+              {TRANSLATIONS[language].common}
             </button>
           </div>
         </div>
@@ -430,9 +497,9 @@ export default function PokemonCard() {
                   pokemon?.rarity === 'rare' ? 'text-purple-500' : 
                   'text-gray-500'
                 }>
-                  {pokemon?.rarity === 'legendary' ? '전설의 포켓몬' :
-                   pokemon?.rarity === 'rare' ? '희귀 포켓몬' : 
-                   '일반 포켓몬'}
+                  {pokemon?.rarity === 'legendary' ? TRANSLATIONS[language].legendary :
+                   pokemon?.rarity === 'rare' ? TRANSLATIONS[language].rare : 
+                   TRANSLATIONS[language].common}
                 </span>
               </div>
 

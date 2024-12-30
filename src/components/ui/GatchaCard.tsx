@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { Button } from "@/components/ui/button";
 import ShareButtons from '@/components/ui/ShareButtons';
 import { Bangers } from 'next/font/google'
+import { useLanguageStore } from '@/store/languageStore';
 
 
 const bangers = Bangers({
@@ -139,6 +140,23 @@ const keyframes = `
   }
 `;
 
+const TRANSLATIONS = {
+  ko: {
+    legendary: '전설의 포켓몬',
+    rare: '희귀 포켓몬',
+    common: '일반 포켓몬',
+    clickToDraw: '클릭하여 포켓몬을 뽑아보세요!',
+    tryAgain: 'Try Again'
+  },
+  en: {
+    legendary: 'Legendary Pokemon',
+    rare: 'Rare Pokemon',
+    common: 'Common Pokemon',
+    clickToDraw: 'Click to draw a Pokemon!',
+    tryAgain: 'Try Again'
+  }
+} as const;
+
 export default function GatchaCard({ isRandom }: IGatchaCardProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isFlipped, setIsFlipped] = useState(false);
@@ -146,6 +164,7 @@ export default function GatchaCard({ isRandom }: IGatchaCardProps) {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
+  const { language } = useLanguageStore();
 
   const handleCardClick = async () => {
     if (isLoading || isFlipped) return;
@@ -258,27 +277,35 @@ export default function GatchaCard({ isRandom }: IGatchaCardProps) {
         >
           {/* 카드 앞면 */}
           <div 
-            className="absolute inset-0 w-full h-full rounded-2xl [backface-visibility:hidden]"
+            className="absolute inset-0 w-full h-full rounded-2xl"
             style={{
               transform: 'rotateY(0deg)',
               transformStyle: 'preserve-3d',
               WebkitBackfaceVisibility: 'hidden',
               backfaceVisibility: 'hidden',
+              opacity: isFlipped ? 0 : 1,
+              transition: 'transform 1s, opacity 0.5s',
+              pointerEvents: isFlipped ? 'none' : 'auto'
             }}
           >
             <div className="relative z-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl p-4 backdrop-blur-sm bg-opacity-80 shadow-inner before:absolute before:inset-0 before:bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.8)_10%,transparent_20%)] before:bg-[length:10px_10px] flex items-center justify-center min-h-[450px]">
-              <span className="text-white text-xl font-bold">Click to draw a Pokemon!</span>
+              <span className="text-white text-xl font-bold">
+                {TRANSLATIONS[language].clickToDraw}
+              </span>
             </div>
           </div>
 
           {/* 카드 뒷면 */}
           <div 
-            className="absolute inset-0 w-full h-full rounded-2xl [backface-visibility:hidden]"
+            className="absolute inset-0 w-full h-full rounded-2xl"
             style={{
               transform: 'rotateY(180deg)',
               transformStyle: 'preserve-3d',
               WebkitBackfaceVisibility: 'hidden',
               backfaceVisibility: 'hidden',
+              opacity: isFlipped ? 1 : 0,
+              transition: 'transform 1s, opacity 0.5s',
+              pointerEvents: isFlipped ? 'auto' : 'none'
             }}
           >
             <div 
@@ -306,9 +333,9 @@ export default function GatchaCard({ isRandom }: IGatchaCardProps) {
                     pokemon?.rarity === 'rare' ? 'text-purple-500' : 
                     'text-gray-500'
                   }>
-                    {pokemon?.rarity === 'legendary' ? '전설의 포켓몬' :
-                     pokemon?.rarity === 'rare' ? '희귀 포켓몬' : 
-                     '일반 포켓몬'}
+                    {pokemon?.rarity === 'legendary' ? TRANSLATIONS[language].legendary :
+                     pokemon?.rarity === 'rare' ? TRANSLATIONS[language].rare : 
+                     TRANSLATIONS[language].common}
                   </span>
                 </div>
 
@@ -375,7 +402,7 @@ export default function GatchaCard({ isRandom }: IGatchaCardProps) {
               mt-6
             `}
           >
-            Try Again
+            {TRANSLATIONS[language].tryAgain}
           </Button>
         </div>
       )}

@@ -1,9 +1,13 @@
+"use client"
+
 import {Button} from "@/components/ui/button"
 import AboutDialog from "@/components/ui/aboutDialog"
-import {Github} from 'lucide-react';
-import {User} from 'lucide-react';
+import {Github, User, Languages} from 'lucide-react';
+import {useLanguageStore} from '@/store/languageStore';
 
 export default function Header() {
+    const {language, toggleLanguage} = useLanguageStore();
+
     const socialLinks = [
         {
             icon: User,
@@ -18,32 +22,51 @@ export default function Header() {
     ];
 
     return (
-        <header className="top-2 w-full  relative">
-            <nav className="container mx-auto flex flex-row gap-3 justify-end px-4">
-                <AboutDialog/>
-                {socialLinks.map((social, index) => {
-                    const Icon = social.icon;
-                    return (
-                        <a
-                            key={index}
-                            href={social.href}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            aria-label={social.ariaLabel}
-                        >
-                            <Button
-                                variant="outline"
-                                size="icon"
-                                className="bg-gradient-to-b from-amber-300 to-amber-400 px-5 py-5
-                                         border-b-4 border-amber-500
-                                         active:translate-y-0.5
-                                         transition-all"
+        <header className="top-2 w-full relative">
+            <nav className="container mx-auto flex flex-row justify-end px-4">
+                <div className="flex gap-3">
+                    <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={toggleLanguage}
+                        className="bg-gradient-to-b from-amber-300 to-amber-400 
+                                 border-b-4 border-amber-500
+                                 active:translate-y-0.5
+                                 transition-all
+                                 min-w-[90px]  px-5 py-5
+                                 flex items-center justify-center gap-2"
+                        aria-label="언어 변경"
+                    >
+                        <Languages className="text-slate-800 hover:text-slate-900"/>
+                        <span className="font-bold">
+                            {language.toUpperCase()}
+                        </span>
+                    </Button>
+                    <AboutDialog/>
+                    {socialLinks.map((social, index) => {
+                        const Icon = social.icon;
+                        return (
+                            <a
+                                key={index}
+                                href={social.href}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                aria-label={social.ariaLabel}
                             >
-                                <Icon className="text-slate-800 hover:text-slate-900"/>
-                            </Button>
-                        </a>
-                    );
-                })}
+                                <Button
+                                    variant="outline"
+                                    size="icon"
+                                    className="bg-gradient-to-b from-amber-300 to-amber-400 px-5 py-5
+                                             border-b-4 border-amber-500
+                                             active:translate-y-0.5
+                                             transition-all"
+                                >
+                                    <Icon className="text-slate-800 hover:text-slate-900"/>
+                                </Button>
+                            </a>
+                        );
+                    })}
+                </div>
             </nav>
         </header>
     );

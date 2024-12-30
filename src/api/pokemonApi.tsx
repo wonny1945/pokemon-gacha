@@ -1,4 +1,6 @@
 // src/api/pokemonApi.ts
+import { useLanguageStore } from '../store/languageStore';
+
 const POKEMON_API_BASE_URL = 'https://pokeapi.co/api/v2';
 const POKEMON_COUNT = 386; // 3세대까지만 
 
@@ -49,7 +51,22 @@ interface PokemonType {
   };
 }
 
+// 설명 텍스트 정리를 위한 유틸리티 함수 추가
+function cleanDescription(text: string): string {
+  return text
+    .replace(/\f/g, ' ')    // 폼피드 문자 제거
+    .replace(/\u000c/g, ' ') // 유니코드 폼피드 문자 제거
+    .replace(/\n/g, ' ')     // 줄바꿈 문자 제거
+    .replace(/\r/g, ' ')     // 캐리지 리턴 제거
+    .replace(/\x0c/g, ' ')   // 폼피드 문자 제거 (16진수)
+    .replace(/\s+/g, ' ')    // 연속된 공백을 하나로 치환
+    .trim();                 // 앞뒤 공백 제거
+}
+
 export async function getRandomPokemon(rarity: PokemonRarity = 'all'): Promise<PokemonData> {
+  // 현재 선택된 언어 가져오기
+  const currentLanguage = useLanguageStore.getState().language;
+  
   let pokemonId: number;
 
   if (rarity === 'all') {
@@ -91,12 +108,14 @@ export async function getRandomPokemon(rarity: PokemonRarity = 'all'): Promise<P
     const pokemonData = await pokemonRes.json();
     const speciesData = await speciesRes.json();
 
-    const koreanName = speciesData.names.find(
-      (name: PokemonName) => name.language.name === 'ko'
+    // 언어에 따른 이름 선택
+    const localizedName = speciesData.names.find(
+      (name: PokemonName) => name.language.name === currentLanguage
     )?.name || pokemonData.name;
 
-    const koreanDescription = speciesData.flavor_text_entries.find(
-      (entry: FlavorTextEntry) => entry.language.name === 'ko'
+    // 언어에 따른 설명 선택
+    const localizedDescription = speciesData.flavor_text_entries.find(
+      (entry: FlavorTextEntry) => entry.language.name === currentLanguage
     )?.flavor_text || '';
 
     const rarityType = LEGENDARY_POKEMON_IDS.includes(pokemonId)
@@ -110,8 +129,8 @@ export async function getRandomPokemon(rarity: PokemonRarity = 'all'): Promise<P
       name: pokemonData.name,
       types: pokemonData.types.map((type: PokemonType) => type.type.name),
       imageUrl: pokemonData.sprites.other['official-artwork'].front_default,
-      koreanName,
-      description: koreanDescription.replace(/\n/g, ' '),
+      koreanName: localizedName,
+      description: cleanDescription(localizedDescription),
       rarity: rarityType
     };
   } catch (error) {
