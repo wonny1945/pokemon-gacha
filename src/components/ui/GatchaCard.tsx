@@ -181,7 +181,7 @@ export default function GatchaCard({ isRandom }: IGatchaCardProps) {
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current) return;
+    if (!cardRef.current || !isFlipped) return;
     
     const card = cardRef.current;
     const rect = card.getBoundingClientRect();
@@ -246,7 +246,7 @@ export default function GatchaCard({ isRandom }: IGatchaCardProps) {
   };
 
   const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
-    if (!cardRef.current) return;
+    if (!cardRef.current || !isFlipped) return;
     e.preventDefault();
     
     const touch = e.touches[0];
@@ -270,12 +270,12 @@ export default function GatchaCard({ isRandom }: IGatchaCardProps) {
   };
 
   const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
-    e.preventDefault();
+    if (!isFlipped) return;
     setIsHovered(true);
   };
 
   const handleTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
-    e.preventDefault();
+    if (!isFlipped) return;
     handleMouseLeave();
   };
 
