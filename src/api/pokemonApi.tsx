@@ -63,10 +63,48 @@ function cleanDescription(text: string): string {
     .trim();                 // 앞뒤 공백 제거
 }
 
-export async function getRandomPokemon(rarity: PokemonRarity = 'all'): Promise<PokemonData> {
-  // 현재 선택된 언어 가져오기
-  const currentLanguage = useLanguageStore.getState().language;
-  
+// ID로 포켓몬을 가져오는 함수 추가
+export async function getPokemonById(id: number, language: string): Promise<PokemonData> {
+  try {
+    const [pokemonRes, speciesRes] = await Promise.all([
+      fetch(`${POKEMON_API_BASE_URL}/pokemon/${id}`),
+      fetch(`${POKEMON_API_BASE_URL}/pokemon-species/${id}`)
+    ]);
+
+    const pokemonData = await pokemonRes.json();
+    const speciesData = await speciesRes.json();
+
+    const localizedName = speciesData.names.find(
+      (name: PokemonName) => name.language.name === language
+    )?.name || pokemonData.name;
+
+    const localizedDescription = speciesData.flavor_text_entries.find(
+      (entry: FlavorTextEntry) => entry.language.name === language
+    )?.flavor_text || '';
+
+    const rarityType = LEGENDARY_POKEMON_IDS.includes(id)
+      ? 'legendary'
+      : RARE_POKEMON_IDS.includes(id)
+      ? 'rare'
+      : 'common';
+
+    return {
+      id: pokemonData.id,
+      name: pokemonData.name,
+      types: pokemonData.types.map((type: PokemonType) => type.type.name),
+      imageUrl: pokemonData.sprites.other['official-artwork'].front_default,
+      koreanName: localizedName,
+      description: cleanDescription(localizedDescription),
+      rarity: rarityType
+    };
+  } catch (error) {
+    console.error('Failed to fetch pokemon:', error);
+    throw new Error('Failed to fetch pokemon');
+  }
+}
+
+// getRandomPokemon 함수 수정
+export async function getRandomPokemon(rarity: PokemonRarity = 'all', language: string): Promise<PokemonData> {
   let pokemonId: number;
 
   if (rarity === 'all') {
@@ -99,42 +137,7 @@ export async function getRandomPokemon(rarity: PokemonRarity = 'all'): Promise<P
       pokemonId = Math.floor(Math.random() * POKEMON_COUNT) + 1;
   }
 
-  try {
-    const [pokemonRes, speciesRes] = await Promise.all([
-      fetch(`${POKEMON_API_BASE_URL}/pokemon/${pokemonId}`),
-      fetch(`${POKEMON_API_BASE_URL}/pokemon-species/${pokemonId}`)
-    ]);
-
-    const pokemonData = await pokemonRes.json();
-    const speciesData = await speciesRes.json();
-
-    // 언어에 따른 이름 선택
-    const localizedName = speciesData.names.find(
-      (name: PokemonName) => name.language.name === currentLanguage
-    )?.name || pokemonData.name;
-
-    // 언어에 따른 설명 선택
-    const localizedDescription = speciesData.flavor_text_entries.find(
-      (entry: FlavorTextEntry) => entry.language.name === currentLanguage
-    )?.flavor_text || '';
-
-    const rarityType = LEGENDARY_POKEMON_IDS.includes(pokemonId)
-      ? 'legendary'
-      : RARE_POKEMON_IDS.includes(pokemonId)
-      ? 'rare'
-      : 'common';
-
-    return {
-      id: pokemonData.id,
-      name: pokemonData.name,
-      types: pokemonData.types.map((type: PokemonType) => type.type.name),
-      imageUrl: pokemonData.sprites.other['official-artwork'].front_default,
-      koreanName: localizedName,
-      description: cleanDescription(localizedDescription),
-      rarity: rarityType
-    };
-  } catch (error) {
-    console.error('Failed to fetch pokemon:', error);
-    throw new Error('Failed to fetch pokemon');
-  }
+  const pokemonData = await getPokemonById(pokemonId, language);
+  useLanguageStore.getState().setCurrentPokemonId(pokemonId);
+  return pokemonData;
 }

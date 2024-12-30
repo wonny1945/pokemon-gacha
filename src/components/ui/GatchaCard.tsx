@@ -1,6 +1,6 @@
 'use client'
-import React, { useState, useRef } from 'react';
-import { getRandomPokemon, PokemonRarity } from '@/api/pokemonApi';
+import React, { useState, useRef, useEffect } from 'react';
+import { getRandomPokemon, PokemonRarity, getPokemonById } from '@/api/pokemonApi';
 import Image from 'next/image';
 import { Button } from "@/components/ui/button";
 import ShareButtons from '@/components/ui/ShareButtons';
@@ -23,6 +23,7 @@ interface Pokemon {
   types: string[];
   description: string;
   rarity: PokemonRarity;
+  id: number;
 }
 
 const typeColors: { [key: string]: string } = {
@@ -166,11 +167,30 @@ export default function GatchaCard({ isRandom }: IGatchaCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const { language } = useLanguageStore();
 
+  // 언어 변경 시 포켓몬 데이터 다시 로드
+  useEffect(() => {
+    const reloadPokemon = async () => {
+      if (pokemon?.id) {
+        try {
+          setIsLoading(true);
+          const data = await getPokemonById(pokemon.id, language);
+          setPokemon(data);
+        } catch (error) {
+          console.error('Failed to reload pokemon:', error);
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    reloadPokemon();
+  }, [language, pokemon?.id]);
+
   const handleCardClick = async () => {
     if (isLoading || isFlipped) return;
     try {
       setIsLoading(true);
-      const randomPokemon = await getRandomPokemon(isRandom ? 'all' : 'common');
+      const randomPokemon = await getRandomPokemon(isRandom ? 'all' : 'common', language);
       setPokemon(randomPokemon);
       setIsFlipped(true);
     } catch (error) {

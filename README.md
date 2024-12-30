@@ -8,6 +8,15 @@
 
 A nostalgic web-based Pokémon card collection game that brings childhood memories to life with modern 3D visualization technology.
 
+## Demo
+
+<img src="./demo/demo.gif" width="250" alt="Pokemon Gacha Demo">
+
+## [🎮✨ Try it Live - Click Here to Play! 🌟](https://pokemon-gacha.vercel.app/)
+
+
+
+
 ## Project Overview
 
 This side project recreates the excitement of random card draws from childhood, implementing 3D prism-style card animations in a web environment. It serves as both a nostalgic experience and a learning platform for advanced web visualization techniques.
@@ -58,4 +67,7 @@ Contributions are welcome! Please feel free to submit issues and pull requests.
 
 ## Contact
 
-For questions or suggestions, please open an issue in the repository.
+For questions or suggestions:
+
+- Open an issue in the repository
+- [Developer Profile](https://bento.me/wonny)

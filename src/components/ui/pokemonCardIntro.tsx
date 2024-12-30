@@ -1,6 +1,6 @@
 'use client'
 import React, { useEffect, useState, useRef } from 'react';
-import { getRandomPokemon } from '@/api/pokemonApi';
+import { getRandomPokemon, getPokemonById } from '@/api/pokemonApi';
 import Image from 'next/image';
 import { useLanguageStore } from '@/store/languageStore';
 
@@ -28,6 +28,7 @@ const typeColors: { [key: string]: string } = {
 };
 
 interface Pokemon {
+  id: number;
   imageUrl: string;
   koreanName: string;
   types: string[];
@@ -203,10 +204,12 @@ const TRANSLATIONS = {
 export default function PokemonCard() {
   const [pokemon, setPokemon] = useState<Pokemon | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isInitialized, setIsInitialized] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
   const [showTutorial, setShowTutorial] = useState(true);
   const [tutorialStep, setTutorialStep] = useState(0);
+  const [isTutorialReady, setIsTutorialReady] = useState(false);
   const tutorialSteps = [
     {
       target: "legendary-btn",
@@ -237,41 +240,111 @@ export default function PokemonCard() {
 
   const { language } = useLanguageStore();
 
-  const TutorialOverlay = () => {
-    if (!showTutorial) return null;
+  useEffect(() => {
+    const initializeTutorial = async () => {
+      try {
+        const data = await getRandomPokemon('legendary', language);
+        setPokemon(data);
+        setIsTutorialReady(true);
+      } catch (error) {
+        console.error('failed to load pokemon:', error);
+      } finally {
+        setIsLoading(false);
+        setIsInitialized(true);
+      }
+    };
 
-    const currentStep = tutorialSteps[tutorialStep];
-    const targetElement = document.getElementById(currentStep.target);
-    const targetRect = targetElement?.getBoundingClientRect();
+    if (!isInitialized) {
+      initializeTutorial();
+    }
+  }, [language, isInitialized]);
+
+  useEffect(() => {
+    const reloadPokemon = async () => {
+      if (pokemon?.id) {
+        try {
+          setIsLoading(true);
+          const data = await getPokemonById(pokemon.id, language);
+          setPokemon(data);
+        } catch (error) {
+          console.error('Failed to reload pokemon:', error);
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    reloadPokemon();
+  }, [language, pokemon?.id]);
+
+  const TutorialOverlay = () => {
+    const [targetRect, setTargetRect] = useState<DOMRect | null>(null);
+    const [isVisible, setIsVisible] = useState(false);
+
+    useEffect(() => {
+      const updateTargetRect = () => {
+        if (!showTutorial || !isTutorialReady) return;
+        
+        const currentStep = tutorialSteps[tutorialStep];
+        const targetElement = document.getElementById(currentStep.target);
+        
+        if (targetElement) {
+          setTargetRect(targetElement.getBoundingClientRect());
+          setTimeout(() => setIsVisible(true), 50);
+        }
+      };
+
+      updateTargetRect();
+
+      const resizeObserver = new ResizeObserver(updateTargetRect);
+      const targetElement = document.getElementById(tutorialSteps[tutorialStep].target);
+      if (targetElement) {
+        resizeObserver.observe(targetElement);
+      }
+
+      return () => {
+        resizeObserver.disconnect();
+        setIsVisible(false);
+      };
+    }, []);
+
+    if (!showTutorial || !isTutorialReady || !targetRect) return null;
 
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div 
+        className={`fixed inset-0 z-50 flex items-center justify-center transition-opacity duration-300 ease-in-out ${
+          isVisible ? 'opacity-100' : 'opacity-0'
+        }`}
+      >
         {/* 배경 오버레이 */}
-        <div className="absolute inset-0 bg-black bg-opacity-50" />
+        <div className="absolute inset-0 bg-black transition-opacity duration-300 ease-in-out" 
+             style={{ opacity: isVisible ? 0.5 : 0 }} />
         
         {/* 하이라이트 영역 */}
-        {targetRect && (
-          <div 
-            className="absolute"
-            style={{
-              top: targetRect.top - 10,
-              left: targetRect.left - 10,
-              width: targetRect.width + 20,
-              height: targetRect.height + 20,
-              border: '2px solid white',
-              borderRadius: '8px',
-              boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.5)',
-              zIndex: 51
-            }}
-          />
-        )}
+        <div 
+          className="absolute transition-all duration-300 ease-in-out"
+          style={{
+            top: targetRect.top - 10,
+            left: targetRect.left - 10,
+            width: targetRect.width + 20,
+            height: targetRect.height + 20,
+            border: '2px solid white',
+            borderRadius: '8px',
+            boxShadow: `0 0 0 9999px rgba(0, 0, 0, ${isVisible ? 0.5 : 0})`,
+            opacity: isVisible ? 1 : 0,
+            transform: `scale(${isVisible ? 1 : 0.95})`,
+            zIndex: 51
+          }}
+        />
 
         <div 
-          className="fixed bg-white rounded-lg p-4 max-w-xs w-full mx-4"
+          className={`fixed bg-white rounded-lg p-4 max-w-xs w-full mx-4 transition-all duration-300 ease-in-out ${
+            isVisible ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
+          }`}
           style={{
             top: '50%',
             left: '50%',
-            transform: 'translate(-50%, -50%)',
+            transform: `translate(-50%, -50%) ${isVisible ? 'scale(1)' : 'scale(0.95)'}`,
             zIndex: 52
           }}
         >
@@ -305,22 +378,6 @@ export default function PokemonCard() {
     );
   };
 
-  useEffect(() => {
-    loadRandomPokemon();
-  }, []);
-
-  const loadRandomPokemon = async () => {
-    try {
-      setIsLoading(true);
-      const data = await getRandomPokemon();
-      setPokemon(data);
-    } catch (error) {
-      console.error('failed to load pokemon:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!cardRef.current) return;
 
@@ -351,7 +408,10 @@ export default function PokemonCard() {
   const loadPokemon = async (rarity: PokemonRarity = 'all') => {
     try {
       setIsLoading(true);
-      const data = await getRandomPokemon(rarity);
+      if (showTutorial) {
+        setShowTutorial(false);
+      }
+      const data = await getRandomPokemon(rarity, language);
       setPokemon(data);
     } catch (error) {
       console.error('Failed to load pokemon:', error);
@@ -416,9 +476,9 @@ export default function PokemonCard() {
     handleMouseLeave();
   };
 
-  if (isLoading) {
+  if (!isInitialized || isLoading) {
     return (
-      <div className="flex justify-center items-center">
+      <div className="flex justify-center items-center min-h-[450px]">
         <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent">
         </div>
       </div>
